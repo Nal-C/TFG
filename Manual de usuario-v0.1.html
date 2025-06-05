@@ -1,0 +1,137 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manual de usuario</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__left">
+    <div class="stackedit__toc">
+      
+<ul>
+<li><a href="#manual-de-usuario-para-la-implementación-de-nuevos-algoritmos-al-editor">Manual de usuario para la implementación de nuevos algoritmos al editor</a>
+<ul>
+<li><a href="#lo-básico-para-empezar">Lo básico para empezar</a></li>
+<li><a href="#cómo-funciona-el-editor">Cómo funciona el editor</a></li>
+<li><a href="#pautas">Pautas</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  <div class="stackedit__right">
+    <div class="stackedit__html">
+      <h1 id="manual-de-usuario-para-la-implementación-de-nuevos-algoritmos-al-editor">Manual de usuario para la implementación de nuevos algoritmos al editor</h1>
+<p>Este documento es lo que sirve de guía para poder implementar cualquier nueva funcionalidad para el editor de grafos de Matemática Discreta, en concreto la implementación de nuevos algoritmos, que he intentando que sea lo más sencillo posible. Dicho esto, voy a detallar lo relacionado a implementar nuevos algoritmos, comenzando por lo esencial y terminando por dar algunos consejos a tener en cuenta.</p>
+<h2 id="lo-básico-para-empezar">Lo básico para empezar</h2>
+<p>Para empezar a desarrollar un nuevo algoritmo, simplemente tienes que hacer los siguientes pasos para que el programa lo pueda detecta y ejecutar:</p>
+<ul>
+<li>Añadir un nuevo botón al panel de “BarraG”, que sea parecido a los otros botones de ese panel.</li>
+</ul>
+<p><img src="C:/Users/salvador/Downloads/MenuAlgoritmos.png" alt="Panel"></p>
+<ul>
+<li>Para ese botón, se le añade un nuevo valor en el evento que activa.</li>
+</ul>
+<p><img src="C:/Users/salvador/Downloads/Evento.png" alt="Evento"></p>
+<ul>
+<li>
+<p>En el script de Control de control, realizar los siguientes pasos:</p>
+<ul>
+<li>
+<p>Modificar el enumerado de esta línea para añadir el algoritmo que quieras implementar<br>
+<img src="C:/Users/salvador/Downloads/EnumAlgoritmos.png" alt="Enum"></p>
+</li>
+<li>
+<p>En la función <code>ejecutarAlgoritmo()</code>, añadir en la sentencia <em>switch-case</em> el valor que hayas asignado al evento del botón, y poner en este caso un código parecido al siguiente:<br>
+<img src="C:/Users/salvador/Downloads/Switch_Case.png" alt="Switch"></p>
+</li>
+</ul>
+</li>
+<li>
+<p>En el script del ejecutor, realizar los siguientes pasos:</p>
+<ul>
+<li>Añadir en la función <code>Starter()</code> el mensaje de comienzo para tu algoritmo<br>
+<img src="C:/Users/salvador/Downloads/Starter.png" alt="Start"></li>
+<li>Añadir en la función <code>èjecutarPaso()</code> un nuevo caso en la sentencia <em>switch-case</em><br>
+<img src="C:/Users/salvador/Downloads/Paso.png" alt="Paso"></li>
+<li>Añadir en la función <code>ejecutarTodo()</code> un caso para el nuevo algoritmo que hayas implementado. Esta función está sobre todo si quieres que ocurra algo especial en el caso de que quieras ejecutarlo todo de golpe, en caso contrario solo debes copiar y pegar el código de los anteriores casos.<br>
+<img src="C:/Users/salvador/Downloads/Todo.png" alt="Todo"></li>
+</ul>
+</li>
+</ul>
+<p>Con esto, ya podrías implementar cualquier algoritmo. Ahora voy a pasar a explicar lo que necesitas saber del editor en general para poder manejarte en el código, además de algunas colecciones que te pueden servir de ayuda para implementar cualquier cosa.</p>
+<h2 id="cómo-funciona-el-editor">Cómo funciona el editor</h2>
+<p>Para el editor tienes que tener en cuenta una cosa, y es que <strong>la estructura de grafo en sí no  existe, si no que es la colección de todos los nodos y aristas que existan en el entorno</strong>. Esto es muy importante, ya que obviamente si quieres todos los nodos o aristas, debes operar con reglas de Unity. En este caso, ya ofrezco la posibilidad de una colección de todos los nodos y aristas en la función <code>èjecutarPaso()</code> gracias a la colección <code>nodos</code> y <code>aristas</code>.</p>
+<p>En el caso de que por lo que sea necesites esa colección para una función auxiliar, necesitarías la siguiente:</p>
+<pre class=" language-undefined"><code class="prism language-{C#} language-undefined">Figura [] figuras  =  GameObject.FindObjectsByType&lt;Figura&gt;(FindObjectsSortMode.None);
+</code></pre>
+<p>Donde figura en este caso significa la componente que quieras buscar en cuestión.</p>
+<p>Otra cosa importante es ver cuáles son los atributos los cuales puedes acceder de cada componente. En este caso, los nodos tendrían esta características:</p>
+<ul>
+<li>Identificador: Identificador interno de cuál es el nodo. Se puede ver en el menú de edición o en el propio nombre si no lo cambiaste</li>
+<li>Nombre: El propio nombre que le quieras dar al nodo</li>
+<li>Color: El propio color del nodo. Funciona con un enumerado, y para poder cambiar de color un nodo es mejor que uses la función <code>cambiaColor()</code> a cambiar el propio valor de color a pelo. Lo segundo muy probablemente no cambiará el color del nodo.</li>
+<li>Adyacentes: Los propios nodos adyacentes al nodo en cuestión. Se representan con la siguiente tupla: <code>(Identificador,peso)</code>. Por ello, si quieres obtener todos los nodos adyacentes de un nodo cualquiera, se debe usar este bucle:</li>
+</ul>
+<pre class=" language-undefined"><code class="prism language-{C#} language-undefined">foreach (Vector2  v  in  actual.adyacentes){
+	Nodo  encontrado  =  null;
+	foreach(Nodo  n  in  nodos){
+		if ((int) v.x  ==  n.ident){
+			encontrado  =  n;
+		}
+	}
+}
+</code></pre>
+<ul>
+<li>Aristas: La colección de aristas a las que está conectado el nodo. Aquí se puede acceder al objeto directamente.</li>
+</ul>
+<p>Para el caso de las aristas, esto serían los atributos de cada arista:</p>
+<ul>
+<li>Identificador: Identificador interno de cada arista. Al igual que un nodo, se puede ver desde el menú de edición.</li>
+<li>Peso: Peso que tiene la arista en cuestión.</li>
+<li>Color: El propio color que tiene la arista. El color de una arista tiene exactamente la misma implementación que la de un nodo, por lo que todo lo que dije del nodo aplica aquí.</li>
+<li>Nodo inicial: El nodo por el cual está conectado el principio de la arista.</li>
+<li>Nodo final: El nodo por el cual está conectado el final de la arista. Para algunos algoritmos viene bien hacer esta distinción, en otros no.</li>
+</ul>
+<p>Con esto, ya se podría operar fácilmente para hacer cualquier algoritmo.<br>
+Además, el ejecutor tiene también a mano una serie de colecciones, en el caso de que se quiera usar alguna a conveniencia para implementar cualquier cosa. Serían las siguientes:</p>
+<ul>
+<li>Actuales: Nodos los cuales se pueden operar en el paso actual.</li>
+<li>Visitados: Nodos que han sido visitados pero los cuales ya no se operan en este paso.</li>
+<li>Visitadas: Aristas que hayan sido visitadas.</li>
+<li>VisitadasP: Aristas que hayan sido visitadas pero no son puente. Es muy importante esta colección en el caso de implementar algoritmos que distinguen entre aristas puente y las que no, como el algoritmo de caminos eulerianos.</li>
+<li>Conjuntos: Una colección que básicamente en vez de operar con nodos, opera con conjuntos de nodos. Al principio cada nodo es un conjunto compuesto por sí mismo, luego puedes hacer lo que quieras.</li>
+</ul>
+<p>A la hora de dar explicaciones, bastaría con que en el final de cada ejecución del paso se actualice el valor de la variable <code>texto.text</code> con la explicación que uno quiera dar. Algo que hay que tener en cuenta claro es que se debe de tener en cuenta cada caso en el que pueda estar el algoritmo para poder dar una explicación. Con esto ya quedaría explicado.</p>
+<p>Para que se pueda implementar cualquier algoritmo, es necesario que exista una condición de fin para que se pueda terminar el algoritmo correctamente. Esta condición es manejado con el booleano <code>terminado</code>, el cual en caso de que esté activado ya no se puede ejecutar ningún paso. Esta condición se puede activar cuando creas conveniente que ha terminado el algoritmo.</p>
+<h2 id="pautas">Pautas</h2>
+<p>Dicho esto, este es el pseudocódigo general que deberías seguir en caso de que quieras implementar algo:</p>
+<pre><code>Si (condicion de fin){
+	terminado = true
+}
+Si no{
+	Si (No hay nada para empezar){
+		Escoger nodo o arista para empezar
+	}
+	Si no{
+		Escoger nodo o arista a partir de lo actual
+		Actualizar el grafo
+	}
+}
+</code></pre>
+<p>Para terminar, voy a dar unos pequeños consejos a la hora de implementar un algoritmo en el editor:</p>
+<p><strong>Intenta que siempre, da igual el tipo de grafo, exista una condición de fin.</strong> En caso contrario, te pueden dar bucles infinitos a la hora de ejecutarlo todo de golpe</p>
+<p><strong>Recuerda que realmente no estoy dando ningún resultado en el grafo, si no que simplemente actualiza valores visuales.</strong> Esto significa que a menos que lo quieras mostrar en las explicaciones no lo veo necesario</p>
+<p><strong>Como valores a modificar de los componentes, te recomiendo que solo modifiques los nombres de los nodos y el color de los componentes</strong>. Estos son los únicos valores que se reinician a la hora de volver al editor normal, y tocar cualquier otro valor pone en riesgo la integridad de todo el grafo.</p>
+<p><strong>No uses la matriz de adyacencia a la hora de implementar un algoritmo</strong>. Si bien existe la opción de convertir una matriz de adyacencia en aristas, esta función modifica un montón de valores que no son deseados a la hora de ejecutar un algoritmo. Es decir, si quieres implementar un algoritmo, te recomiendo que intentes pensar más bien cómo funciona visualmente en vez copiar cualquier algoritmo en internet.</p>
+
+    </div>
+  </div>
+</body>
+
+</html>
